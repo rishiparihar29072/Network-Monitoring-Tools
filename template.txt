@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Network Monitoring</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Network Monitoring</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>NIC</th>
+                <th>Bytes Sent</th>
+                <th>Bytes Received</th>
+                <th>Packets Sent</th>
+                <th>Packets Received</th>
+                <th>Errors In</th>
+                <th>Errors Out</th>
+                <th>Drop In</th>
+                <th>Drop Out</th>
+            </tr>
+        </thead>
+        <tbody id="network-stats"></tbody>
+    </table>
+    <script>
+        async function fetchNetworkStats() {
+            const response = await fetch('/api/network_stats');
+            const data = await response.json();
+            const tableBody = document.getElementById('network-stats');
+            tableBody.innerHTML = '';
+            for (const [nic, stats] of Object.entries(data)) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${nic}</td>
+                    <td>${stats.bytes_sent}</td>
+                    <td>${stats.bytes_recv}</td>
+                    <td>${stats.packets_sent}</td>
+                    <td>${stats.packets_recv}</td>
+                    <td>${stats.errin}</td>
+                    <td>${stats.errout}</td>
+                    <td>${stats.dropin}</td>
+                    <td>${stats.dropout}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+        }
+
+        setInterval(fetchNetworkStats, 5000);
+        fetchNetworkStats();
+    </script>
+</body>
+</html>
