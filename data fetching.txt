@@ -1,0 +1,38 @@
+<?php
+$servername = "localhost";
+$username = "username";
+$password = "password";
+$dbname = "network_monitoring";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+
+$sql = "SELECT timestamp, cpu_usage FROM metrics WHERE device='router1'";
+$result = $conn->query($sql);
+
+$timestamps = [];
+$cpu_usage = [];
+
+if ($result->num_rows > 0) {
+  while($row = $result->fetch_assoc()) {
+    $timestamps[] = $row["timestamp"];
+    $cpu_usage[] = $row["cpu_usage"];
+  }
+} else {
+  echo "0 results";
+}
+$conn->close();
+?>
+
+<script>
+    var timestamps = <?php echo json_encode($timestamps); ?>;
+    var cpuUsage = <?php echo json_encode($cpu_usage); ?>;
+    myChart.data.labels = timestamps;
+    myChart.data.datasets[0].data = cpuUsage;
+    myChart.update();
+</script>
